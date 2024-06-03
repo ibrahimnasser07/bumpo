@@ -8,7 +8,7 @@ class LocationManager {
     LocationPermission permission;
 
     serviceEnabled =
-    await GeolocatorPlatform.instance.isLocationServiceEnabled();
+        await GeolocatorPlatform.instance.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
     }

@@ -32,3 +32,19 @@ class MinimumSpeedChangedEvent extends HomeEvent {
 
   MinimumSpeedChangedEvent(this.speed);
 }
+
+class AddBumpToFirebaseEvent extends HomeEvent {
+  final LatLng position;
+
+  AddBumpToFirebaseEvent(this.position);
+}
+
+class StartLocationUpdates extends HomeEvent {}
+
+class CheckProximity extends HomeEvent {
+  final Position position;
+
+  CheckProximity(this.position);
+}
+
+class CheckLocationPermission extends HomeEvent {}

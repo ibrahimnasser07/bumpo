@@ -28,7 +28,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeBloc(SettingsRepo()),
+      create: (context) =>
+          HomeBloc(SettingsRepo())..add(CheckLocationPermission()),
       child: BlocBuilder<HomeBloc, HomeState>(
         buildWhen: (_, c) => c is AppThemeState,
         builder: (context, state) {
