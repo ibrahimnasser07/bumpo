@@ -13,3 +13,12 @@ final class AppThemeState extends HomeState {
     return "AppThemeChanged($themeMode)";
   }
 }
+
+final class GoogleMapCreatedSuccess extends HomeState {}
+
+final class SensorIntervalSetSuccess extends HomeState {}
+
+final class ThresholdSetSuccess extends HomeState {}
+
+final class MinSpeedSetSuccess extends HomeState {}
+

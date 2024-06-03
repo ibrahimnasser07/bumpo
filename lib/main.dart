@@ -1,4 +1,5 @@
 import 'package:bumpo/bloc/home_bloc.dart';
+import 'package:bumpo/data/repo/settings_repo.dart';
 import 'package:bumpo/ui/screens/home.dart';
 import 'package:bumpo/utils/constants.dart';
 import 'package:bumpo/utils/theme.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeBloc(),
+      create: (context) => HomeBloc(SettingsRepo()),
       child: BlocBuilder<HomeBloc, HomeState>(
         buildWhen: (_, c) => c is AppThemeState,
         builder: (context, state) {

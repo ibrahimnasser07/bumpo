@@ -11,20 +11,23 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home"),
-      ),
+      appBar: AppBar(title: const Text("Bumpo Home")),
       drawer: const AppDrawer(),
-      body: GoogleMap(
-        onMapCreated: (mapController) {
-          context.read<HomeBloc>().add(GoogleMapCreatedEvent(mapController));
+      body: BlocBuilder<HomeBloc, HomeState>(
+        buildWhen: (_, c) => c is GoogleMapCreatedSuccess,
+        builder: (context, state) {
+          return GoogleMap(
+            onMapCreated: (mapController) => context
+                .read<HomeBloc>()
+                .add(GoogleMapCreatedEvent(mapController)),
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(30.0444, 31.2357),
+              zoom: 18.0,
+            ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+          );
         },
-        initialCameraPosition: const CameraPosition(
-          target: LatLng(30.0444, 31.2357),
-          zoom: 18.0,
-        ),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
       ),
     );
   }
