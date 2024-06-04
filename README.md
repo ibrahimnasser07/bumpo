@@ -38,16 +38,16 @@ To install the app, download and install the APK file on your Android device. En
 
 ## Screenshots
 
-![Bumpo Home](screenshots/Bumpo Home Screen with Location Permissions Denied.jpg)
+![Bumpo Home](screenshots/BumpoHomeScreenwithLocationPermissionsDenied.jpg)
 *Bumpo Home Screen with Location Permissions Denied*
 
-![Bumpo Map](screenshots/Bumpo Map Display with Live Location Tracking.jpg)
+![Bumpo Map](screenshots/BumpoMapDisplaywithLiveLocationTracking.jpg)
 *Bumpo Map Display with Live Location Tracking*
 
-![Bumpo Settings](screenshots/Bumpo Settings Menu light.jpg)
+![Bumpo Settings](screenshots/BumpoSettingsMenuLight.jpg)
 *Bumpo Settings Menu (Light Mode)*
 
-![Bumpo Settings](screenshots/Bumpo Settings Menu dark.jpg)
+![Bumpo Settings](screenshots/BumpoSettingsMenuDark.jpg)
 *Bumpo Settings Menu (Dark Mode)*
 
 ## License
