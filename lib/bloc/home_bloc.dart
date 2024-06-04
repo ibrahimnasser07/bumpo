@@ -159,6 +159,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       double z = event.z;
       double deltaZ = (z - _lastZ).abs();
 
+      if(deltaZ > 5){
+        print("deltaZ: $deltaZ");
+      }
+
       if (deltaZ > _repo.getCurrentThreshold()) {
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
@@ -171,7 +175,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             marker.position.latitude,
             marker.position.longitude,
           );
-          return distance <= 100;
+          return distance <= 80;
         });
 
         if (position.speed >= (_repo.getMinimumSpeed() * (5 / 18)) &&
@@ -237,6 +241,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   double _calculateDistance(
       double lat1, double lon1, double lat2, double lon2) {
+
     const double R = 6371000; // Earth radius in meters
     final double dLat = (lat2 - lat1) * (math.pi / 180.0);
     final double dLon = (lon2 - lon1) * (math.pi / 180.0);
@@ -248,10 +253,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             math.sin(dLon / 2);
 
     final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return R * c; // Distance in meters
+    // return R * c; // Distance in meters
+    return Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
   }
 
-  void _onCheckLocationPermission(CheckLocationPermission event, Emitter<HomeState> emit) async {
+  void _onCheckLocationPermission(
+      CheckLocationPermission event, Emitter<HomeState> emit) async {
     emit(PermissionCheckInProgress());
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -270,7 +277,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      emit(LocationPermissionDenied("Location permissions are permanently denied."));
+      emit(LocationPermissionDenied(
+          "Location permissions are permanently denied."));
       return;
     }
 
