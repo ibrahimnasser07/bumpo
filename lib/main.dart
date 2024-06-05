@@ -6,6 +6,7 @@ import 'package:bumpo/utils/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'firebase_options.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
             ),
             themeMode:
                 state is AppThemeState ? state.themeMode : ThemeMode.light,
+            builder: EasyLoading.init(),
             home: const Home(),
           );
         },

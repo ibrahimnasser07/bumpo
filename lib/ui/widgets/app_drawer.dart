@@ -58,10 +58,10 @@ class AppDrawer extends StatelessWidget {
               label: "Interval (msec)",
               controller: context.read<HomeBloc>().intervalController,
             ),
-            TextFieldListTile(
-              label: "Min. Speed (km/hr)",
-              controller: context.read<HomeBloc>().minSpeedController,
-            ),
+            // TextFieldListTile(
+            //   label: "Min. Speed (km/hr)",
+            //   controller: context.read<HomeBloc>().minSpeedController,
+            // ),
           ],
         ),
       ),

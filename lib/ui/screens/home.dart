@@ -1,5 +1,7 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../bloc/home_bloc.dart';
@@ -14,7 +16,17 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Bumpo Home")),
       drawer: const AppDrawer(),
-      body: BlocBuilder<HomeBloc, HomeState>(
+      body: BlocConsumer<HomeBloc, HomeState>(
+        listener: (context, state) {
+          if (state is LocationIsWithinRange) {
+            AudioPlayer().play(AssetSource('warning_beep.mp3'));
+            EasyLoading.showInfo(
+              "Bump is close!",
+              dismissOnTap: true,
+              duration: const Duration(seconds: 2),
+            );
+          }
+        },
         buildWhen: (_, c) =>
             c is MarkersFetchedSuccessfully ||
             c is BumpSavedSuccessfully ||
