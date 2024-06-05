@@ -26,6 +26,8 @@ class LocationUpdateSuccess extends HomeState {
   }
 }
 
+final class LocationIsWithinRange extends HomeState {}
+
 final class MarkersFetchedSuccessfully extends HomeState {}
 
 final class SensorIntervalSetSuccess extends HomeState {}

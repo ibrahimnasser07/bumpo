@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'dart:math' as math;
 
 import '../data/models/bump.dart';
 import '../data/repo/settings_repo.dart';
@@ -25,7 +23,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GoogleMapCreatedEvent>(_googleMapCreated);
     on<SetSensorIntervalEvent>(_intervalChanged);
     on<ThresholdChangedEvent>(_thresholdChanged);
-    on<MinimumSpeedChangedEvent>(_minSpeedChanged);
+    // on<MinimumSpeedChangedEvent>(_minSpeedChanged);
     on<AddBumpToFirebaseEvent>(_addBumpToFirebase);
     on<StartLocationUpdates>(_onStartLocationUpdates);
     on<CheckProximity>(_onCheckProximity);
@@ -37,8 +35,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   bool _isDetecting = false;
   final intervalController = TextEditingController();
   final thresholdController = TextEditingController();
-  final minSpeedController = TextEditingController();
-  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // final minSpeedController = TextEditingController();
   StreamSubscription<Position>? _positionStreamSubscription;
   final Set<String> _activeMarkers = <String>{};
   Set<Marker> markers = {};
@@ -70,8 +68,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       StartLocationUpdates event, Emitter<HomeState> emit) {
     _positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 2,
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 1,
       ),
     ).listen((Position position) {
       add(CheckProximity(position));
@@ -93,7 +91,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (distance <= 20) {
         currentProximityMarkers.add(marker.markerId.value);
         if (!_activeMarkers.contains(marker.markerId.value)) {
-          await _audioPlayer.play(AssetSource('lib/sounds/warning_beep.mp3'));
+          emit(LocationIsWithinRange());
+        } else {
+          debugPrint(
+            'Marker ${marker.markerId.value} is already in active markers.',
+          );
         }
       }
     }
@@ -139,16 +141,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ),
     );
     markers.add(await _convertBumpToMarker(savedBump));
+    _activeMarkers.add(savedBump.id!);
     emit(BumpSavedSuccessfully());
   }
 
-  Future<void> _minSpeedChanged(
-    MinimumSpeedChangedEvent event,
-    Emitter<HomeState> emit,
-  ) async {
-    _repo.saveMinimumSpeed(event.speed);
-    emit(MinSpeedSetSuccess());
-  }
+  // Future<void> _minSpeedChanged(
+  //   MinimumSpeedChangedEvent event,
+  //   Emitter<HomeState> emit,
+  // ) async {
+  //   _repo.saveMinimumSpeed(event.speed);
+  //   emit(MinSpeedSetSuccess());
+  // }
 
   void _detectBump(UserAccelerometerEvent event) async {
     if (_isDetecting) return;
@@ -161,7 +164,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       if (deltaZ > _repo.getCurrentThreshold()) {
         Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
+          desiredAccuracy: LocationAccuracy.best,
         );
 
         bool isWithinRadius = markers.any((marker) {
@@ -171,11 +174,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             marker.position.latitude,
             marker.position.longitude,
           );
-          return distance <= 100;
+          return distance <= 5;
         });
 
-        if (position.speed >= (_repo.getMinimumSpeed() * (5 / 18)) &&
-            !isWithinRadius) {
+        if (!isWithinRadius) {
           add(
             AddBumpToFirebaseEvent(
               LatLng(position.latitude, position.longitude),
@@ -193,7 +195,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _initControllers() {
     intervalController.text = _repo.getCurrentInterval().toString();
     thresholdController.text = _repo.getCurrentThreshold().toString();
-    minSpeedController.text = _repo.getMinimumSpeed().toString();
+    // minSpeedController.text = _repo.getMinimumSpeed().toString();
     intervalController.addListener(
       () {
         if (intervalController.text.isNotEmpty) {
@@ -208,13 +210,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       },
     );
-    minSpeedController.addListener(
-      () {
-        if (minSpeedController.text.isNotEmpty) {
-          add(MinimumSpeedChangedEvent(int.parse(minSpeedController.text)));
-        }
-      },
-    );
+    // minSpeedController.addListener(
+    //   () {
+    //     if (minSpeedController.text.isNotEmpty) {
+    //       add(MinimumSpeedChangedEvent(int.parse(minSpeedController.text)));
+    //     }
+    //   },
+    // );
   }
 
   Future<void> _fetchMarkers() async {
@@ -237,21 +239,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   double _calculateDistance(
       double lat1, double lon1, double lat2, double lon2) {
-    const double R = 6371000; // Earth radius in meters
-    final double dLat = (lat2 - lat1) * (math.pi / 180.0);
-    final double dLon = (lon2 - lon1) * (math.pi / 180.0);
-
-    final double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(lat1 * (math.pi / 180.0)) *
-            math.cos(lat2 * (math.pi / 180.0)) *
-            math.sin(dLon / 2) *
-            math.sin(dLon / 2);
-
-    final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return R * c; // Distance in meters
+    // const double R = 6371000; // Earth radius in meters
+    // final double dLat = (lat2 - lat1) * (math.pi / 180.0);
+    // final double dLon = (lon2 - lon1) * (math.pi / 180.0);
+    //
+    // final double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    //     math.cos(lat1 * (math.pi / 180.0)) *
+    //         math.cos(lat2 * (math.pi / 180.0)) *
+    //         math.sin(dLon / 2) *
+    //         math.sin(dLon / 2);
+    //
+    // final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
+    // return R * c; // Distance in meters
   }
 
-  void _onCheckLocationPermission(CheckLocationPermission event, Emitter<HomeState> emit) async {
+  void _onCheckLocationPermission(
+      CheckLocationPermission event, Emitter<HomeState> emit) async {
     emit(PermissionCheckInProgress());
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -270,7 +274,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      emit(LocationPermissionDenied("Location permissions are permanently denied."));
+      emit(LocationPermissionDenied(
+          "Location permissions are permanently denied."));
       return;
     }
 
